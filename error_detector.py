@@ -35,7 +35,16 @@ def analyze_errors(log_data):
         "Count": count[most_common_error],
         "Suggestion": suggest_fix(most_common_error)
     }
-
+    
+def suggest_fix(error):
+    if "not found" in error.lower():
+        return "Check file path or file existence"
+    elif "null" in error.lower():
+        return "Check object initialization"
+    elif "memory" in error.lower():
+        return "Optimize memory usage"
+    else:
+        return "Unknown error: requires manual debugging"
 
 print("Paste logs (type END to finish):")
 
