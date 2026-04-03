@@ -53,6 +53,10 @@ result = analyze_errors(log_input)
 print("\nAnalysis Result:")
 print(result)
 
+file_path = input("Enter file path: ")
+with open(file_path, "r") as f:
+    log_input = f.read()
+
 from collections import Counter
 
 def analyze_errors(log_data):
