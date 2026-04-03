@@ -52,3 +52,21 @@ result = analyze_errors(log_input)
 
 print("\nAnalysis Result:")
 print(result)
+
+from collections import Counter
+
+def analyze_errors(log_data):
+    errors = extract_errors(log_data)
+
+    if not errors:
+        return "No errors found"
+
+    count = Counter(errors)
+
+    sorted_errors = count.most_common()
+
+    return {
+        "Top Errors": sorted_errors[:3],
+        "Most Frequent Error": sorted_errors[0][0],
+        "Suggestion": suggest_fix(sorted_errors[0][0])
+    }
