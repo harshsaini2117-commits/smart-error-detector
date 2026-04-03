@@ -1,42 +1,37 @@
 from collections import Counter
+import re
 
 
-# Extract errors from logs (case-insensitive + flexible parsing)
+# Extract errors using regex (flexible + real-world style)
 def extract_errors(log_data):
     errors = []
+    pattern = re.compile(r'error[:\s]*(.*)', re.IGNORECASE)
 
     for line in log_data.split("\n"):
-        line_lower = line.lower()
-
-        if "error" in line_lower:
-            parts = line.split("ERROR:")
-            if len(parts) > 1:
-                error_message = parts[1].strip()
-            else:
-                error_message = line.strip()
-
-            errors.append(error_message)
+        match = pattern.search(line)
+        if match:
+            errors.append(match.group(1).strip())
 
     return errors
 
 
-# Smart suggestion system (pattern-based, not hardcoded exact match)
+# Suggest fix based on pattern (pseudo-AI behavior)
 def suggest_fix(error):
     error = error.lower()
 
     if "not found" in error:
         return "Check file path or ensure file exists"
     elif "null" in error:
-        return "Ensure object is initialized before use"
+        return "Ensure object is initialized"
     elif "memory" in error:
-        return "Optimize memory usage or increase memory"
+        return "Optimize memory usage"
     elif "permission" in error:
-        return "Check file or system permissions"
+        return "Check permissions"
     else:
-        return "Unknown error: requires manual debugging"
+        return "Manual debugging required"
 
 
-# Main analysis function
+# Analyze errors
 def analyze_errors(log_data):
     errors = extract_errors(log_data)
 
@@ -50,13 +45,13 @@ def analyze_errors(log_data):
         "top_errors": sorted_errors[:3],
         "most_frequent": sorted_errors[0][0],
         "count": sorted_errors[0][1],
-        "suggestion": suggest_fix(sorted_errors[0][0])
+        "all_counts": count
     }
 
 
-# Input system (file + manual both)
+# Input system (file + manual)
 def get_input():
-    choice = input("1. Paste logs\n2. Read from file\nChoose option: ")
+    choice = input("1. Paste logs\n2. Read from file\nChoose: ")
 
     if choice == "2":
         file_path = input("Enter file path: ")
@@ -66,7 +61,6 @@ def get_input():
         except FileNotFoundError:
             print("File not found!")
             return None
-
     else:
         print("Paste logs (type END to finish):")
         lines = []
@@ -75,11 +69,10 @@ def get_input():
             if line == "END":
                 break
             lines.append(line)
-
         return "\n".join(lines)
 
 
-# MAIN PROGRAM
+# MAIN
 log_data = get_input()
 
 if log_data:
@@ -96,11 +89,18 @@ if log_data:
         print(result["most_frequent"])
 
         print("\nSuggestion:")
-        print(result["suggestion"])
+        print(suggest_fix(result["most_frequent"]))
 
-        # Basic severity insight
+        # Severity insight
         if result["count"] > 5:
-            print("\n⚠ High frequency error detected! System may be unstable.")
+            print("\nHigh frequency error detected!")
+
+        # Percentage analysis
+        total = sum(result["all_counts"].values())
+        print("\nError Distribution:")
+        for err, cnt in result["all_counts"].items():
+            percent = (cnt / total) * 100
+            print(f"{err}: {percent:.2f}%")
 
     else:
         print("No errors found.")
