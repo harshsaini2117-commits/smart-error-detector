@@ -48,6 +48,25 @@ def suggest_fix(error):
 
 print("Paste logs (type END to finish):")
 
+choice = input("1. Paste logs\n2. Use file\nChoose option: ")
+
+if choice == "2":
+    file_path = input("Enter file path: ")
+    with open(file_path, "r") as f:
+        log_input = f.read()
+else:
+    print("Paste logs (END to stop):")
+    lines = []
+    while True:
+        line = input()
+        if line == "END":
+            break
+        lines.append(line)
+    log_input = "\n".join(lines)
+
+if count["ERROR"] > 5:
+    print("High system instability detected")
+
 lines = []
 while True:
     line = input()
